@@ -39,7 +39,7 @@ class GitlabLoader extends BaseLoader {
         if (!empty($this->token)) {
             $args['headers']['Authorization'] = $this->get_auth_header();
         }
-        $get_url = "https://$this->domain/api/v4/projects/$this->owner/repository/files/$this->file_path/raw";
+        $get_url = "$this->scheme://$this->domain:$this->port/api/v4/projects/$this->owner/repository/files/$this->file_path/raw";
 
         $wp_remote = wp_remote_get($get_url, $args);
         $response_body = wp_remote_retrieve_body($wp_remote);
@@ -58,7 +58,9 @@ class GitlabLoader extends BaseLoader {
     protected function set_repo_details(string $url)
     {
         $url_parsed = parse_url($url);
+        $scheme = $url_parsed['scheme'];
         $domain = $url_parsed['host'];
+        $port = $url_parsed['port'];
         $path = $url_parsed['path'];
 
         $exploded_path = explode('/-/', $path);
@@ -68,7 +70,9 @@ class GitlabLoader extends BaseLoader {
         $branch = $exploded_path_last[1];
         $file_path = urlencode(implode('/', array_slice($exploded_path_last, 2)));
 
+        $this->scheme = $scheme;
         $this->domain = $domain;
+        $this->port = $port;
         $this->owner = urlencode($owner);
         $this->branch = $branch;
         $this->file_path = $file_path;
@@ -95,7 +99,7 @@ class GitlabLoader extends BaseLoader {
         if (!empty($this->token)) {
             $args['headers']['Authorization'] = $this->get_auth_header();
         }
-        $get_url = "https://$this->domain/api/v4/projects/$this->owner/repository/commits";
+        $get_url = "$this->scheme://$this->domain:$this->port/api/v4/projects/$this->owner/repository/commits";
 
         $wp_remote = wp_remote_get($get_url, $args);
         $response_body = wp_remote_retrieve_body($wp_remote);
